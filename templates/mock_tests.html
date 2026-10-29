@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Mock tests{% endblock %}
+{% block content %}
+<section class="page-wrap container">
+  <div class="page-heading"><div><span class="eyebrow">Put your knowledge to the test</span><h1>Mock tests</h1><p>Focused, timed practice with answer review and server-calculated scores.</p></div><div class="heading-badge">◷ <b>{{ tests|length }}</b><small>available</small></div></div>
+  <div class="test-grid">{% for test in tests %}<article class="test-card"><div class="test-card-top"><span class="feature-icon icon-purple">◷</span><span class="pill pill-green">Ready to start</span></div><span class="eyebrow">{{ test.category.name }}</span><h2>{{ test.title }}</h2><p>{{ test.description }}</p><div class="test-facts"><span>◷ {{ test.duration_minutes }} min</span><span>◇ {{ test.question_count }} questions</span><span>Pass {{ test.passing_percentage }}%</span></div><form method="post" action="{{ url_for('start_test', test_id=test.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-primary button-full" type="submit">Start test <span>→</span></button></form></article>{% else %}<div class="empty-state"><span class="empty-icon">◷</span><h3>No tests published yet</h3><p>Check back soon for a new challenge.</p></div>{% endfor %}</div>
+</section>
+{% endblock %}

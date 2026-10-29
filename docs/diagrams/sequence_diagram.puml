@@ -1,0 +1,41 @@
+@startuml
+title Prepwise — Secure mock-test lifecycle
+actor Student
+boundary Browser
+control "Flask test route" as Route
+control "Flask-Login / owner check" as Auth
+control "Test scoring logic" as Scorer
+database SQLite
+Student -> Browser: Select published test
+Browser -> Route: POST /mock-tests/{id}/start
+Route -> Auth: Require authenticated student
+Auth --> Route: Active user identity
+Route -> SQLite: Create in_progress TestAttempt
+SQLite --> Route: attempt id + server started_at
+Route --> Browser: Redirect to attempt
+Browser -> Route: GET /test-attempts/{attempt}
+Route -> Auth: Verify owner or admin
+Route -> SQLite: Load test questions/options
+note right of Route
+  Correct answer keys are not
+  serialized to the browser.
+end note
+SQLite --> Route: Question text and choices
+Route --> Browser: Render test and remaining time
+Student -> Browser: Select options and submit
+Browser -> Route: POST answer IDs and choices
+Route -> Auth: Re-check attempt ownership/state
+Route -> SQLite: Load allowed test question IDs and keys
+SQLite --> Route: Authoritative test configuration
+Route -> Scorer: Validate choices and calculate marks
+Scorer --> Route: Score, percentage, answer review
+Route -> SQLite: Persist answers and submitted attempt
+Route -> Scorer: Refresh rule-based suggestions
+Scorer -> SQLite: Store recommendations
+Route --> Browser: Redirect to result
+Browser -> Route: GET private result
+Route -> Auth: Verify result owner or admin
+Route -> SQLite: Load score and answer review
+SQLite --> Route: Persisted result records
+Route --> Browser: Render result and explanations
+@enduml

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Practice question{% endblock %}
+{% block content %}
+<section class="page-wrap narrow-wrap">
+  <a class="back-link" href="{{ url_for('questions') }}">← Back to questions</a>
+  <article class="panel detail-panel"><div class="detail-meta"><span class="pill pill-indigo">{{ question.category.name }}</span><span class="pill pill-neutral">{{ question.difficulty }}</span><span class="pill pill-neutral">{{ 'Multiple choice' if question.question_type == 'mcq' else 'Discussion' }}</span></div><h1>{{ question.question_text }}</h1>
+    {% if question.question_type == 'mcq' %}<form method="post" class="answer-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="complete"><fieldset><legend>Choose your answer</legend>{% for letter, option in [('A',question.option_a),('B',question.option_b),('C',question.option_c),('D',question.option_d)] %}<label class="option-row"><input type="radio" name="answer" value="{{ letter }}" required><span class="option-letter">{{ letter }}</span><span>{{ option }}</span></label>{% endfor %}</fieldset><button class="button button-primary" type="submit">Check and record answer <span>→</span></button></form>
+    {% else %}<p class="lead-small">Take a moment to think through the answer, then mark your practice complete to reveal the sample discussion points.</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="complete"><button class="button button-primary" type="submit">Mark as practiced</button></form>{% endif %}
+    <div class="answer-reveal"><div class="answer-reveal-title"><span>✦</span><b>Answer & explanation</b></div>{% if question.question_type == 'mcq' %}<p><b>Correct answer: {{ question.correct_answer }}</b> — {{ {'A': question.option_a, 'B': question.option_b, 'C': question.option_c, 'D': question.option_d}[question.correct_answer] }}</p>{% endif %}<p>{{ question.explanation or 'Use this question to explain the concept clearly and support your answer with a relevant example.' }}</p></div>
+    <form method="post" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="bookmark"><button class="button button-quiet" type="submit">{{ '★ Remove bookmark' if bookmarked else '☆ Save bookmark' }}</button></form>
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Admin workspace{% endblock %}
+{% block content %}
+<section class="page-wrap container">
+  <div class="page-heading"><div><span class="eyebrow">Platform management</span><h1>Admin workspace</h1><p>Manage learning content and review student activity.</p></div><span class="pill pill-coral">Administrator</span></div>
+  <div class="stat-grid">
+    <article class="stat-card stat-indigo"><span class="stat-label">Students</span><strong>{{ student_count }}</strong><small>Registered accounts</small><i>◎</i></article>
+    <article class="stat-card stat-cyan"><span class="stat-label">Questions</span><strong>{{ question_count }}</strong><small>Across all categories</small><i>◇</i></article>
+    <article class="stat-card stat-coral"><span class="stat-label">Mock tests</span><strong>{{ test_count }}</strong><small>Configured assessments</small><i>◷</i></article>
+    <article class="stat-card stat-green"><span class="stat-label">Test results</span><strong>{{ result_count }}</strong><small>Submitted attempts</small><i>↗</i></article>
+  </div>
+  <div class="admin-grid">
+    <section class="panel"><span class="eyebrow">Content studio</span><h2>Add an interview question</h2>
+      <form method="post" action="{{ url_for('admin_add_question') }}" class="form-stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Question text<textarea name="question_text" rows="3" maxlength="2000" required></textarea></label>
+        <label>Category<select name="category_id" required>{% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}</select></label>
+        <div class="form-two"><label>Difficulty<select name="difficulty"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></label><label>Type<select name="question_type"><option value="mcq">Multiple choice</option><option value="descriptive">Discussion</option></select></label></div>
+        <div class="form-two"><label>Option A<input name="option_a" maxlength="300"></label><label>Option B<input name="option_b" maxlength="300"></label></div>
+        <div class="form-two"><label>Option C<input name="option_c" maxlength="300"></label><label>Option D<input name="option_d" maxlength="300"></label></div>
+        <div class="form-two"><label>Correct option<select name="correct_answer"><option value="">Not applicable</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label><label>Explanation<input name="explanation" maxlength="3000"></label></div>
+        <button class="button button-primary" type="submit">Add question <span>→</span></button>
+      </form>
+    </section>
+    <section class="panel"><span class="eyebrow">Assessment builder</span><h2>Create a mock test</h2>
+      <form method="post" action="{{ url_for('admin_add_test') }}" class="form-stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Test title<input name="title" maxlength="120" required></label>
+        <label>Description<textarea name="description" rows="2" maxlength="2000"></textarea></label>
+        <label>Category<select name="category_id" required>{% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}</select></label>
+        <div class="form-two"><label>Duration (1–180 min)<input name="duration_minutes" type="number" min="1" max="180" value="15" required></label><label>Pass percentage<input name="passing_percentage" type="number" min="0" max="100" value="50" required></label></div>
+        <label>Questions (Ctrl/Cmd-click to select multiple)<select name="question_ids" multiple size="7" required>{% for question in questions if question.question_type == 'mcq' %}<option value="{{ question.id }}">#{{ question.id }} · {{ question.category.name }} · {{ question.question_text|truncate(70) }}</option>{% endfor %}</select><small>Only questions in the selected category are included.</small></label>
+        <button class="button button-primary" type="submit">Create mock test <span>→</span></button>
+      </form>
+    </section>
+  </div>
+  <div class="admin-grid admin-tools">
+    <section class="panel"><span class="eyebrow">Organize content</span><h2>Add a category</h2><form method="post" action="{{ url_for('admin_add_category') }}" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Category name<input name="name" maxlength="80" required></label><label>Description<input name="description" maxlength="240"></label><button class="button button-primary" type="submit">Add category</button></form></section>
+    <section class="panel"><span class="eyebrow">Coding library</span><h2>Add a coding problem</h2><form method="post" action="{{ url_for('admin_add_coding_problem') }}" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Title<input name="title" maxlength="120" required></label><label>Description<textarea name="description" maxlength="3000" rows="2" required></textarea></label><div class="form-two"><label>Sample input<textarea name="sample_input" maxlength="2000" rows="2" required></textarea></label><label>Sample output<textarea name="sample_output" maxlength="2000" rows="2" required></textarea></label></div><div class="form-two"><label>Constraints<input name="constraints" maxlength="1000"></label><label>Hint<input name="hints" maxlength="1000"></label></div><button class="button button-primary" type="submit">Add coding problem</button></form></section>
+  </div>
+  <section class="panel admin-table-panel"><span class="eyebrow">HR preparation</span><h2>Add an HR prompt</h2><form method="post" action="{{ url_for('admin_add_hr_question') }}" class="admin-inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Question<input name="question_text" maxlength="300" required></label><label>Category<input name="category" maxlength="60" value="General"></label><label>Example structure<input name="example_answer" maxlength="3000" required></label><label>Answer tips<input name="answer_tips" maxlength="1000" required></label><button class="button button-primary button-small" type="submit">Add HR prompt</button></form></section>
+  <section class="panel admin-table-panel"><div class="panel-head"><div><span class="eyebrow">Recent learners</span><h2>Student accounts</h2></div></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Email</th><th>Preferred role</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead><tbody>
+    {% for user in users %}<tr><td><b>{{ user.full_name }}</b></td><td>{{ user.email }}</td><td>{{ user.preferred_job_role or '—' }}</td><td>{{ user.created_at.strftime('%b %d, %Y') }}</td><td><span class="pill {{ 'pill-green' if user.is_active else 'pill-coral' }}">{{ 'Active' if user.is_active else 'Disabled' }}</span></td><td><form method="post" action="{{ url_for('admin_toggle_user', user_id=user.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action" type="submit" {% if user.id == current_user.id %}disabled{% endif %}>{{ 'Disable' if user.is_active else 'Enable' }}</button></form></td></tr>{% else %}<tr><td colspan="6">No students registered yet.</td></tr>{% endfor %}
+  </tbody></table></div></section>
+  <section class="panel admin-table-panel"><div class="panel-head"><div><span class="eyebrow">Assessment activity</span><h2>Recent test results</h2></div></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Test</th><th>Score</th><th>Submitted</th></tr></thead><tbody>
+    {% for attempt in attempts %}<tr><td>{{ attempt.user.full_name }}</td><td>{{ attempt.test.title }}</td><td><b>{{ attempt.percentage|round|int }}%</b></td><td>{{ attempt.submitted_at.strftime('%b %d, %Y') }}</td></tr>{% else %}<tr><td colspan="4">No submitted test attempts yet.</td></tr>{% endfor %}
+  </tbody></table></div></section>
+  <section class="panel admin-table-panel"><div class="panel-head"><div><span class="eyebrow">Content library</span><h2>Questions</h2></div></div><div class="table-wrap"><table><thead><tr><th>Prompt</th><th>Category</th><th>Type</th><th>Actions</th></tr></thead><tbody>
+    {% for question in questions %}<tr><td>{{ question.question_text|truncate(80) }}</td><td>{{ question.category.name }}</td><td>{{ question.question_type }}</td><td class="table-actions"><a class="table-action" href="{{ url_for('admin_edit_question', question_id=question.id) }}">Edit</a><form method="post" action="{{ url_for('admin_delete_question', question_id=question.id) }}" data-confirm="Delete this question? Questions used by tests or practice history cannot be deleted."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action danger-action" type="submit">Delete</button></form></td></tr>{% else %}<tr><td colspan="4">No questions yet.</td></tr>{% endfor %}
+  </tbody></table></div></section>
+  <section class="panel admin-table-panel"><div class="panel-head"><div><span class="eyebrow">Assessment configuration</span><h2>Mock tests</h2></div></div><div class="table-wrap"><table><thead><tr><th>Test</th><th>Category</th><th>Duration</th><th>Pass mark</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    {% for test in tests %}<tr><td>{{ test.title }}</td><td>{{ test.category.name }}</td><td>{{ test.duration_minutes }} min</td><td>{{ test.passing_percentage }}%</td><td><span class="pill {{ 'pill-green' if test.is_published else 'pill-neutral' }}">{{ 'Published' if test.is_published else 'Draft' }}</span></td><td class="table-actions"><a class="table-action" href="{{ url_for('admin_edit_test', test_id=test.id) }}">Edit</a><form method="post" action="{{ url_for('admin_delete_test', test_id=test.id) }}" data-confirm="Delete this test? Tests with attempts cannot be deleted."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action danger-action" type="submit">Delete</button></form></td></tr>{% else %}<tr><td colspan="6">No tests configured.</td></tr>{% endfor %}
+  </tbody></table></div></section>
+  <div class="admin-grid">
+    <section class="panel admin-table-panel"><span class="eyebrow">Available categories</span><h2>Question categories</h2><div class="table-wrap"><table><thead><tr><th>Name</th><th>Description</th><th>Actions</th></tr></thead><tbody>
+      {% for category in categories %}<tr><td colspan="3"><form method="post" action="{{ url_for('admin_edit_category', category_id=category.id) }}" class="category-edit-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input name="name" value="{{ category.name }}" maxlength="80" required><input name="description" value="{{ category.description }}" maxlength="240"><button class="table-action" type="submit">Save</button></form><form method="post" action="{{ url_for('admin_delete_category', category_id=category.id) }}" data-confirm="Delete this category? Categories used by content cannot be deleted."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action danger-action" type="submit">Delete</button></form></td></tr>{% else %}<tr><td colspan="3">No categories.</td></tr>{% endfor %}
+    </tbody></table></div></section>
+    <section class="panel admin-table-panel"><span class="eyebrow">Practice libraries</span><h2>Coding problems</h2><div class="table-wrap"><table><thead><tr><th>Problem</th><th>Level</th><th>Action</th></tr></thead><tbody>
+      {% for problem in coding_problems %}<tr><td>{{ problem.title }}</td><td>{{ problem.difficulty }}</td><td><form method="post" action="{{ url_for('admin_delete_coding_problem', problem_id=problem.id) }}" data-confirm="Delete this coding problem? Existing submissions prevent deletion."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action danger-action" type="submit">Delete</button></form></td></tr>{% else %}<tr><td colspan="3">No coding problems.</td></tr>{% endfor %}
+    </tbody></table></div><h2 class="admin-subhead">HR prompts</h2><div class="table-wrap"><table><thead><tr><th>Question</th><th>Category</th><th>Action</th></tr></thead><tbody>
+      {% for question in hr_questions %}<tr><td>{{ question.question_text|truncate(55) }}</td><td>{{ question.category }}</td><td><form method="post" action="{{ url_for('admin_delete_hr_question', question_id=question.id) }}" data-confirm="Delete this HR prompt? Existing student drafts prevent deletion."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="table-action danger-action" type="submit">Delete</button></form></td></tr>{% else %}<tr><td colspan="3">No HR prompts.</td></tr>{% endfor %}
+    </tbody></table></div></section>
+  </div>
+</section>
+{% endblock %}

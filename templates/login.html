@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<section class="auth-wrap"><div class="auth-aside"><span class="eyebrow eyebrow-light">Welcome back</span><h1>Your next step is waiting.</h1><p>Pick up your preparation journey and keep building confidence.</p><div class="auth-aside-note">Practice consistently. Progress confidently. <b>✦</b></div></div>
+<div class="auth-card"><span class="eyebrow">Student workspace</span><h2>Log in to Prepwise</h2><p class="muted">Enter your account details to continue.</p>
+<form method="post" class="form-stack">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Email address<input name="email" type="email" autocomplete="email" required maxlength="254" value="{{ request.form.get('email','') }}"></label>
+  <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+  <button class="button button-primary button-full" type="submit">Log in <span>→</span></button>
+</form><p class="auth-switch">New to Prepwise? <a href="{{ url_for('register') }}">Create an account</a></p></div></section>
+{% endblock %}

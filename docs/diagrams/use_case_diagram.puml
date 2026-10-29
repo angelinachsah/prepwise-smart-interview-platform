@@ -1,0 +1,45 @@
+@startuml
+title Prepwise — Student and administrator use cases
+left to right direction
+actor Student
+actor Admin
+rectangle "Prepwise Smart Interview Preparation Platform" {
+  usecase "Register / log in" as UC1
+  usecase "Browse and practice questions" as UC2
+  usecase "Bookmark questions" as UC3
+  usecase "Take timed mock tests" as UC4
+  usecase "Review test results" as UC5
+  usecase "Submit coding sample" as UC6
+  usecase "Draft HR answers" as UC7
+  usecase "View progress" as UC8
+  usecase "Receive recommendations" as UC9
+  usecase "Manage profile" as UC10
+  usecase "Manage questions" as UC11
+  usecase "Manage categories" as UC12
+  usecase "Manage tests" as UC13
+  usecase "Manage coding and HR content" as UC14
+  usecase "Enable / disable student accounts" as UC15
+  usecase "View student performance" as UC16
+}
+Student --> UC1
+Student --> UC2
+Student --> UC3
+Student --> UC4
+Student --> UC5
+Student --> UC6
+Student --> UC7
+Student --> UC8
+Student --> UC9
+Student --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+Admin --> UC1
+note bottom of UC6
+  Submitted source code is never executed.
+  Only manually entered sample output is compared.
+end note
+@enduml

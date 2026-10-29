@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#6366f1">
+  <title>{% block title %}Prepwise{% endblock %} · Smart Interview Prep</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('landing') }}"><span class="brand-mark">✦</span> prepwise</a>
+    <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <nav class="main-nav" aria-label="Main navigation">
+      {% if current_user.is_authenticated %}
+        {% if current_user.role == "admin" %}
+          <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+        {% else %}
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('questions') }}">Questions</a>
+          <a href="{{ url_for('mock_tests') }}">Mock tests</a>
+          <a href="{{ url_for('progress') }}">Progress</a>
+        {% endif %}
+        <a href="{{ url_for('profile') }}">Profile</a>
+        <form class="nav-form" method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="nav-link" type="submit">Log out</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('landing') }}#features">Features</a>
+        <a href="{{ url_for('login') }}">Log in</a>
+        <a class="button button-small" href="{{ url_for('register') }}">Get started</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    <div class="toast-stack" aria-live="polite">
+      {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="toast toast-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <a class="brand" href="{{ url_for('landing') }}"><span class="brand-mark">✦</span> prepwise</a>
+    <span>Small steps. Strong interviews. · Student microproject</span>
+    <a href="{{ url_for('landing') }}#features">Explore features</a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ problem.title }}{% endblock %}
+{% block content %}
+<section class="page-wrap narrow-wrap"><a class="back-link" href="{{ url_for('coding') }}">← Back to coding practice</a><article class="panel detail-panel">
+  <span class="pill pill-neutral">{{ problem.difficulty }}</span><h1>{{ problem.title }}</h1><p class="lead-small">{{ problem.description }}</p>
+  <div class="problem-specs"><div><h3>Input format</h3><p>{{ problem.input_format }}</p></div><div><h3>Output format</h3><p>{{ problem.output_format }}</p></div><div><h3>Constraints</h3><p>{{ problem.constraints }}</p></div></div>
+  <div class="sample-block"><h3>Sample input</h3><pre>{{ problem.sample_input }}</pre><h3>Expected sample output</h3><pre>{{ problem.sample_output }}</pre></div>
+  <details class="hint-box"><summary>Need a hint?</summary><p>{{ problem.hints }}</p><p><b>Approach:</b> {{ problem.solution_explanation }}</p></details>
+  <form method="post" class="form-stack code-submit"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Your Python solution<textarea name="code" rows="12" maxlength="20000" required placeholder="Write your solution here. It will be stored, not executed."></textarea></label><label>Observed output for the sample<input name="observed_output" required maxlength="2000" placeholder="Enter the output you got when testing locally"></label><p class="notice notice-info">This sample check only compares your entered output with the example. Your code is never run by the server, and a match does not prove it passes hidden tests.</p><button class="button button-primary" type="submit">Check sample output <span>→</span></button></form>
+</article></section>
+{% endblock %}

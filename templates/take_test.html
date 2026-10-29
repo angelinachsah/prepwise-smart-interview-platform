@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ attempt.test.title }}{% endblock %}
+{% block content %}
+<section class="test-page container">
+  <div class="test-heading"><div><span class="eyebrow">{{ attempt.test.category.name }} · Timed assessment</span><h1>{{ attempt.test.title }}</h1><p>Take your time, review your choices, and submit when you are ready.</p></div><div class="timer-card" data-countdown="{{ remaining_seconds }}"><span>Time remaining</span><strong id="countdown">--:--</strong></div></div>
+  <form id="test-form" method="post" action="{{ url_for('take_test', attempt_id=attempt.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="test-meta-bar"><span><b id="answered-count">0</b> answered</span><span><b id="unanswered-count">{{ questions|length }}</b> unanswered</span><span><b id="review-count">0</b> for review</span><button class="button button-primary button-small" type="submit" data-confirm="Submit this test now?">Submit test <span>→</span></button></div>
+    <div class="test-question-list">{% for question in questions %}<article class="panel test-question" id="question-{{ loop.index }}" data-question-index="{{ loop.index }}"><div class="question-card-top"><span class="pill pill-indigo">Question {{ loop.index }} of {{ questions|length }}</span><button type="button" class="review-toggle" aria-pressed="false">☆ Mark for review</button></div><h2>{{ question.question_text }}</h2><div class="test-options">{% for letter, option in [('A',question.option_a),('B',question.option_b),('C',question.option_c),('D',question.option_d)] %}<label class="option-row"><input type="radio" name="q_{{ question.id }}" value="{{ letter }}" {% if existing_answers.get(question.id) == letter %}checked{% endif %}><span class="option-letter">{{ letter }}</span><span>{{ option }}</span></label>{% endfor %}</div><div class="test-nav"><button type="button" class="button button-quiet button-small" data-step="-1" {% if loop.first %}disabled{% endif %}>← Previous</button><button type="button" class="button button-quiet button-small" data-step="1" {% if loop.last %}disabled{% endif %}>Next →</button></div></article>{% endfor %}</div>
+    <div class="test-submit-bottom"><p>Answers are scored securely after submission.</p><button class="button button-primary" type="submit" data-confirm="Submit this test now?">Finish and submit <span>→</span></button></div>
+  </form>
+</section>
+{% endblock %}

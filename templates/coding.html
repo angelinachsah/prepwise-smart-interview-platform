@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Coding practice{% endblock %}
+{% block content %}
+<section class="page-wrap container"><div class="page-heading"><div><span class="eyebrow">Think it through, one problem at a time</span><h1>Coding practice</h1><p>15 beginner problems with examples, hints, and a safe sample-output check.</p></div><div class="heading-badge">{ } <b>{{ solved|length }}</b><small>sample checks passed</small></div></div>
+  <div class="notice notice-info"><b>Safe practice mode:</b> Prepwise does not execute submitted code. You can compare your manually entered sample output; this is not a full correctness check.</div>
+  <div class="problem-grid">{% for problem in problems %}<a class="problem-card" href="{{ url_for('coding_detail', problem_id=problem.id) }}"><div class="problem-card-head"><span class="feature-icon icon-coral">{ }</span>{% if problem.id in solved %}<span class="pill pill-green">Sample passed ✓</span>{% else %}<span class="pill pill-neutral">{{ problem.difficulty }}</span>{% endif %}</div><h2>{{ problem.title }}</h2><p>{{ problem.description }}</p><span class="problem-link">Open problem →</span></a>{% else %}<div class="empty-state"><h3>No problems available yet</h3><p>Seed sample data to add the starter coding set.</p></div>{% endfor %}</div>
+</section>
+{% endblock %}

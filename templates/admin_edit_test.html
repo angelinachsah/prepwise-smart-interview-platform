@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Edit mock test{% endblock %}
+{% block content %}
+<section class="page-wrap narrow-wrap"><a class="back-link" href="{{ url_for('admin_dashboard') }}">← Admin workspace</a><article class="panel detail-panel"><span class="eyebrow">Assessment configuration</span><h1>Edit mock test</h1><p class="lead-small">Question selection is fixed after creation. Tests with attempt history are locked to protect stored results.</p>
+  <form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Test title<input name="title" value="{{ test.title }}" maxlength="120" required></label>
+    <label>Description<textarea name="description" rows="3" maxlength="2000">{{ test.description }}</textarea></label>
+    <div class="form-two"><label>Duration (1–180 minutes)<input name="duration_minutes" type="number" min="1" max="180" value="{{ test.duration_minutes }}" required></label><label>Passing percentage<input name="passing_percentage" type="number" min="0" max="100" value="{{ test.passing_percentage }}" required></label></div>
+    <label class="checkbox-line"><input type="checkbox" name="is_published" value="yes" {% if test.is_published %}checked{% endif %}> Published and available to students</label>
+    <button class="button button-primary" type="submit">Save test</button>
+  </form>
+</article></section>
+{% endblock %}

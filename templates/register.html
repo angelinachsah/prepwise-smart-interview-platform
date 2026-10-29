@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<section class="auth-wrap"><div class="auth-aside"><span class="eyebrow eyebrow-light">A smarter start</span><h1>Make preparation your superpower.</h1><p>Your questions, practice, and next steps—together in one space.</p><div class="auth-aside-note">Start free. Grow at your pace. <b>✦</b></div></div>
+<div class="auth-card"><span class="eyebrow">Create your workspace</span><h2>Join Prepwise</h2><p class="muted">A few details are all you need to get started.</p>
+<form method="post" class="form-stack">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Full name<input name="full_name" autocomplete="name" required maxlength="100" value="{{ request.form.get('full_name','') }}"></label>
+  <label>Email address<input name="email" type="email" autocomplete="email" required maxlength="254" value="{{ request.form.get('email','') }}"></label>
+  <div class="form-two"><label>Password<input name="password" type="password" autocomplete="new-password" minlength="8" required><small>8+ characters, upper/lowercase and a number.</small></label><label>Confirm password<input name="confirm_password" type="password" autocomplete="new-password" required></label></div>
+  <label>Preferred job role <span class="optional">(optional)</span><input name="preferred_job_role" maxlength="100" value="{{ request.form.get('preferred_job_role','') }}" placeholder="e.g. Software Engineer"></label>
+  <label>Education or department <span class="optional">(optional)</span><input name="education" maxlength="120" value="{{ request.form.get('education','') }}" placeholder="e.g. Computer Science"></label>
+  <button class="button button-primary button-full" type="submit">Create account <span>→</span></button>
+</form><p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p></div></section>
+{% endblock %}

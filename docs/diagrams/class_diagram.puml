@@ -1,0 +1,119 @@
+@startuml
+title Prepwise — Core data model
+hide methods
+skinparam classAttributeIconSize 0
+class User {
+  id: int
+  full_name: string
+  email: string
+  password_hash: string
+  role: string
+  preferred_job_role: string
+  education: string
+  is_active: bool
+}
+class Category {
+  id: int
+  name: string
+  description: string
+}
+class Question {
+  id: int
+  question_text: text
+  question_type: string
+  difficulty: string
+  correct_answer: string?
+  explanation: text
+}
+class Bookmark {
+  id: int
+  user_id: int
+  question_id: int
+}
+class QuestionAttempt {
+  id: int
+  is_correct: bool?
+  created_at: datetime
+}
+class MockTest {
+  id: int
+  title: string
+  duration_minutes: int
+  passing_percentage: int
+  is_published: bool
+}
+class TestQuestion {
+  id: int
+  marks: int
+}
+class TestAttempt {
+  id: int
+  started_at: datetime
+  submitted_at: datetime?
+  score: int?
+  percentage: float?
+  status: string
+}
+class AttemptAnswer {
+  id: int
+  selected_answer: string?
+  is_correct: bool
+  marks_awarded: int
+}
+class CodingProblem {
+  id: int
+  title: string
+  sample_input: text
+  sample_output: text
+}
+class CodingSubmission {
+  id: int
+  submitted_code: text
+  result_status: string
+  submitted_at: datetime
+}
+class HRQuestion {
+  id: int
+  question_text: string
+  example_answer: text
+}
+class HRPractice {
+  id: int
+  personal_answer: text
+  is_practiced: bool
+}
+class Recommendation {
+  id: int
+  title: string
+  priority: string
+  is_completed: bool
+}
+class ActivityLog {
+  id: int
+  activity_type: string
+  score: float?
+}
+User "1" -- "0..*" Bookmark
+Question "1" -- "0..*" Bookmark
+User "1" -- "0..*" QuestionAttempt
+Question "1" -- "0..*" QuestionAttempt
+Category "1" -- "0..*" Question
+Category "1" -- "0..*" MockTest
+MockTest "1" -- "1..*" TestQuestion
+Question "1" -- "0..*" TestQuestion
+User "1" -- "0..*" TestAttempt
+MockTest "1" -- "0..*" TestAttempt
+TestAttempt "1" -- "0..*" AttemptAnswer
+Question "1" -- "0..*" AttemptAnswer
+User "1" -- "0..*" CodingSubmission
+CodingProblem "1" -- "0..*" CodingSubmission
+User "1" -- "0..*" HRPractice
+HRQuestion "1" -- "0..*" HRPractice
+User "1" -- "0..*" Recommendation
+Category "0..1" -- "0..*" Recommendation
+User "1" -- "0..*" ActivityLog
+note right of CodingSubmission
+  Sample-only check.
+  No execution service.
+end note
+@enduml

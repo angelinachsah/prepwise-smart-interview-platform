@@ -1,0 +1,18 @@
+@startuml
+title Prepwise — TestAttempt lifecycle
+[*] --> "Not Started"
+"Not Started" --> "In Progress" : start / persist started_at
+"In Progress" --> Submitted : student submits valid answers
+"In Progress" --> Expired : server deadline reached
+Expired --> Evaluated : auto-submit and score
+Submitted --> Evaluated : validate, score, persist
+Evaluated --> [*] : result available
+note right of "In Progress"
+  Correct answers remain on the server.
+  Only the owner (or admin) can view results.
+end note
+note bottom of Evaluated
+  Repeated submissions do not change
+  a completed attempt.
+end note
+@enduml

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit question{% endblock %}
+{% block content %}
+<section class="page-wrap narrow-wrap"><a class="back-link" href="{{ url_for('admin_dashboard') }}">← Admin workspace</a><article class="panel detail-panel"><span class="eyebrow">Content studio</span><h1>Edit question</h1>
+  <form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Question text<textarea name="question_text" rows="4" maxlength="2000" required>{{ question.question_text }}</textarea></label>
+    <label>Category<select name="category_id">{% for category in categories %}<option value="{{ category.id }}" {% if question.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></label>
+    <div class="form-two"><label>Difficulty<select name="difficulty">{% for level in ['Beginner','Intermediate','Advanced'] %}<option {% if question.difficulty == level %}selected{% endif %}>{{ level }}</option>{% endfor %}</select></label><label>Question type<select name="question_type"><option value="mcq" {% if question.question_type == 'mcq' %}selected{% endif %}>Multiple choice</option><option value="descriptive" {% if question.question_type != 'mcq' %}selected{% endif %}>Discussion</option></select></label></div>
+    <div class="form-two"><label>Option A<input name="option_a" value="{{ question.option_a or '' }}" maxlength="300"></label><label>Option B<input name="option_b" value="{{ question.option_b or '' }}" maxlength="300"></label></div>
+    <div class="form-two"><label>Option C<input name="option_c" value="{{ question.option_c or '' }}" maxlength="300"></label><label>Option D<input name="option_d" value="{{ question.option_d or '' }}" maxlength="300"></label></div>
+    <div class="form-two"><label>Correct option<select name="correct_answer"><option value="">Not applicable</option>{% for letter in ['A','B','C','D'] %}<option {% if question.correct_answer == letter %}selected{% endif %}>{{ letter }}</option>{% endfor %}</select></label><label>Explanation<input name="explanation" value="{{ question.explanation }}" maxlength="3000"></label></div>
+    <button class="button button-primary" type="submit">Save question</button>
+  </form>
+</article></section>
+{% endblock %}

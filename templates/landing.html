@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Prepare with purpose{% endblock %}
+{% block content %}
+<section class="hero container">
+  <div class="hero-copy reveal">
+    <span class="eyebrow"><span class="pulse-dot"></span> Your placement journey, made personal</span>
+    <h1>Your dream job starts with <span class="gradient-text">smart preparation.</span></h1>
+    <p class="lead">Practice technical questions, take timed mock tests, sharpen your coding, and see exactly where to focus next.</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="{{ url_for('register') }}">Start preparing free <span>→</span></a>
+      <a class="button button-quiet" href="#features">Explore features <span>↓</span></a>
+    </div>
+    <div class="social-proof"><div class="avatar-stack"><span>J</span><span>A</span><span>S</span><span>+</span></div><div><strong>One focused session at a time</strong><small>Build momentum you can measure</small></div></div>
+  </div>
+  <div class="hero-art reveal" aria-label="Illustration of an interview preparation dashboard">
+    <div class="art-glow"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+    <div class="mock-window">
+      <div class="window-head"><span></span><span></span><span></span><small>weekly progress</small></div>
+      <div class="mock-title">You're making progress <b>✦</b></div>
+      <div class="mock-chart"><i style="height:34%"></i><i style="height:54%"></i><i style="height:43%"></i><i style="height:73%"></i><i style="height:63%"></i><i style="height:88%"></i><i style="height:78%"></i></div>
+      <div class="mock-bottom"><div><small>Practice streak</small><strong>Keep it going</strong></div><div class="mini-ring">✦</div></div>
+    </div>
+    <div class="float-card float-card-top"><span class="float-icon purple">✓</span><div><strong>One goal at a time</strong><small>Personalized next steps</small></div></div>
+    <div class="float-card float-card-bottom"><span class="float-icon aqua">⌘</span><div><strong>Learn by doing</strong><small>Questions · tests · coding</small></div></div>
+  </div>
+</section>
+<section class="trust-strip container"><span>Everything you need, in one place</span><div><b>TECHNICAL</b><b>APTITUDE</b><b>CODING</b><b>HR PRACTICE</b></div></section>
+<section class="section container" id="features">
+  <div class="section-heading reveal"><span class="eyebrow">A better way to prepare</span><h2>Make every practice session <span class="gradient-text">count.</span></h2><p>Purposeful tools to go from “I should prepare” to interview-ready.</p></div>
+  <div class="feature-grid">
+    <article class="feature-card reveal"><div class="feature-icon icon-purple">✦</div><h3>Practice that sticks</h3><p>Explore categorized questions, reveal explanations, and track the topics you have covered.</p><a href="{{ url_for('register') }}">Explore questions <span>→</span></a></article>
+    <article class="feature-card reveal"><div class="feature-icon icon-blue">◷</div><h3>Mock tests, real focus</h3><p>Take timed assessments, review every answer, and learn from your result.</p><a href="{{ url_for('register') }}">See mock tests <span>→</span></a></article>
+    <article class="feature-card reveal"><div class="feature-icon icon-coral">{ }</div><h3>Build coding confidence</h3><p>Work through beginner problems with examples and a safe sample-check workflow.</p><a href="{{ url_for('register') }}">Start coding <span>→</span></a></article>
+    <article class="feature-card reveal"><div class="feature-icon icon-green">↗</div><h3>Know what to do next</h3><p>See your measured performance and get rule-based suggestions tied to your practice.</p><a href="{{ url_for('register') }}">View your path <span>→</span></a></article>
+  </div>
+</section>
+<section class="workflow-band"><div class="container workflow-inner"><div><span class="eyebrow eyebrow-light">Your preparation loop</span><h2>Learn. Practice. <span>Grow.</span></h2><p>Build a steady routine with a clear next step after every session.</p></div><div class="workflow-steps"><div><b>01</b><span>Choose a focus</span></div><div><b>02</b><span>Practice with purpose</span></div><div><b>03</b><span>Review your progress</span></div></div></div></section>
+<section class="section container"><div class="section-heading reveal"><span class="eyebrow">Built for better habits</span><h2>Small wins add up to <span class="gradient-text">big confidence.</span></h2></div><div class="benefit-row"><div class="benefit"><strong>01</strong><h3>Start where you are</h3><p>Useful empty states make your first session easy to begin.</p></div><div class="benefit"><strong>02</strong><h3>See real progress</h3><p>Your dashboard is based on your saved activity, not made-up scores.</p></div><div class="benefit"><strong>03</strong><h3>Stay in control</h3><p>Your personal answers and account details stay in your local app database.</p></div></div></section>
+<section class="cta container"><div class="cta-card reveal"><div><span class="eyebrow eyebrow-light">Your next opportunity starts here</span><h2>Ready to make progress?</h2><p>Create your account and take your first focused step.</p></div><a class="button button-white" href="{{ url_for('register') }}">Start preparing free <span>→</span></a><span class="cta-spark">✦</span></div></section>
+{% endblock %}

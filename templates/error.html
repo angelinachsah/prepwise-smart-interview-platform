@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="error-page"><span class="error-code">{{ code }}</span><span class="eyebrow">That was unexpected</span><h1>{{ title }}</h1><p>{{ message }}</p><a class="button button-primary" href="{{ url_for('landing') }}">Back to Prepwise <span>→</span></a></section>
+{% endblock %}

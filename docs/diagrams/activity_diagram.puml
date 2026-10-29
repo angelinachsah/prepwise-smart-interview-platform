@@ -1,0 +1,37 @@
+@startuml
+title Prepwise — Student preparation workflow
+start
+:Student signs in;
+:Open dashboard and review saved activity;
+if (Choose a preparation area) then (Questions)
+  :Filter by category and difficulty;
+  :Answer or reflect on a question;
+  :Save practice activity;
+elseif (Mock test)
+  :Start timed attempt;
+  :Answer and navigate questions;
+  if (Timer expires?) then (Yes)
+    :Server automatically submits;
+  else (No)
+    :Student submits test;
+  endif
+  :Validate IDs and score on server;
+  :Persist result and answer review;
+elseif (Coding)
+  :Read problem, sample, and hints;
+  :Enter source code and observed output;
+  :Compare entered output to sample only;
+  :Store sample pass/fail without executing code;
+elseif (HR)
+  :Select HR prompt;
+  :Draft and save personal response;
+endif
+:Update progress from stored activity;
+if (Measured performance available?) then (Yes)
+  :Generate rule-based recommendations;
+else (No)
+  :Show onboarding suggestions;
+endif
+:Review next step;
+stop
+@enduml

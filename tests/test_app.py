@@ -1,13 +1,13 @@
 import json
 import re
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta, timezone
 
 import pytest
 
-from app import create_app
+from app import create_app, summarize_activity_streak
 from models import (
-    Category, CodingProblem, MockTest, Question, TestAttempt as DBTestAttempt,
-    User, db, utcnow,
+    ActivityLog, Category, CodingProblem, MockTest, Question,
+    TestAttempt as DBTestAttempt, User, db, utcnow,
 )
 from seed import seed_data
 
@@ -56,6 +56,72 @@ def test_landing_and_student_dashboard(client):
     assert b"Your progress starts here" in response.data
 
 
+def test_activity_streak_counts_distinct_days_and_breaks_at_gaps():
+    today = date(2026, 5, 13)
+    summary = summarize_activity_streak({
+        today, today - timedelta(days=1), today - timedelta(days=1),
+        today - timedelta(days=2), today - timedelta(days=5),
+        today - timedelta(days=6), today - timedelta(days=7),
+    }, today=today)
+
+    assert summary["current"] == 3
+    assert summary["best"] == 3
+    assert summary["total_days"] == 6
+    assert summary["active_today"] is True
+    assert [day["active"] for day in summary["week_days"]] == [
+        True, True, False, False, True, True, True,
+    ]
+
+
+def test_activity_streak_continues_from_yesterday_and_tracks_best_run():
+    today = date(2026, 5, 13)
+    summary = summarize_activity_streak({
+        today - timedelta(days=1), today - timedelta(days=2),
+        today - timedelta(days=3), today - timedelta(days=8),
+        today - timedelta(days=9), today - timedelta(days=10),
+        today - timedelta(days=11),
+    }, today=today)
+
+    assert summary["current"] == 3
+    assert summary["best"] == 4
+    assert summary["active_today"] is False
+
+
+def test_empty_activity_streak_starts_at_zero():
+    summary = summarize_activity_streak(set(), today=date(2026, 5, 13))
+
+    assert summary["current"] == 0
+    assert summary["best"] == 0
+    assert summary["total_days"] == 0
+    assert summary["active_today"] is False
+    assert len(summary["week_days"]) == 7
+
+
+def test_dashboard_shows_streak_from_persisted_activity(client, app):
+    login(client)
+    with app.app_context():
+        user_id = User.query.filter_by(email="student@test.local").first().id
+        today = utcnow().date()
+        for days_ago in (0, 1, 2, 1):
+            db.session.add(ActivityLog(
+                user_id=user_id,
+                activity_type="question_practice",
+                created_at=datetime.combine(
+                    today - timedelta(days=days_ago), time(12),
+                    tzinfo=timezone.utc,
+                ),
+            ))
+        db.session.commit()
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"3 day" in response.data and b"streak" in response.data
+    assert b"BEST STREAK" in response.data
+    assert b"ACTIVE DAYS" in response.data
+    assert b"3 days" in response.data
+
+
 def test_registration_password_rules_and_duplicate_email(client):
     weak = client.post("/register", data={
         "full_name": "New Student", "email": "new@test.local",
@@ -77,7 +143,7 @@ def test_registration_password_rules_and_duplicate_email(client):
         "password": "GoodPass123", "confirm_password": "GoodPass123",
     }, follow_redirects=True)
     assert created.status_code == 200
-    assert b"Hey, New" in created.data
+    assert b"Welcome back, New" in created.data
 
 
 def test_login_logout_and_protected_dashboard(client):

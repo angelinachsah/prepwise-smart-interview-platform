@@ -77,6 +77,7 @@ The operator installs packages from `requirements.txt`, sets a private secret, a
 | FR-022 | The system shall protect state-changing forms with CSRF validation. | Flask-WTF global CSRF configuration. |
 | FR-023 | The system shall allow admins to add, rename, and conditionally remove categories. | Admin category routes; categories used by content cannot be deleted. |
 | FR-024 | The system shall allow admins to add and conditionally remove coding and HR content. | Admin creation/deletion routes; content with submissions/drafts is protected. |
+| FR-025 | The dashboard shall show the student's current and best consecutive active-day streaks, total active days, and activity for the last seven UTC dates. | Streak helper and dashboard integration tests; multiple activities on one date count as one active day. |
 
 ## 4. Non-functional requirements
 
@@ -95,7 +96,7 @@ The operator installs packages from `requirements.txt`, sets a private secret, a
 ## 5. External interface requirements
 
 ### 5.1 User interface
-The browser UI uses a responsive SaaS-style dashboard, a desktop sidebar, a mobile navigation toggle, semantic forms, charts, status badges, confirmation dialogs, and toast messages.
+The browser UI uses a responsive SaaS-style dashboard, a desktop sidebar, a mobile navigation toggle, semantic forms, charts, status badges, confirmation dialogs, and toast messages. The dashboard presents current and best activity streaks plus a seven-day activity view calculated using UTC dates.
 
 ### 5.2 Software interfaces
 Flask handles HTTP and sessions; SQLAlchemy maps application models to SQLite; Flask-Login handles sessions; Flask-WTF supplies CSRF protection; Chart.js renders analytics.

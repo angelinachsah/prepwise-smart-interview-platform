@@ -2,16 +2,103 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="app-shell">
-  <aside class="sidebar"><div class="sidebar-label">Workspace</div><a class="side-link active" href="{{ url_for('dashboard') }}">◫ <span>Dashboard</span></a><a class="side-link" href="{{ url_for('questions') }}">◇ <span>Interview questions</span></a><a class="side-link" href="{{ url_for('mock_tests') }}">◷ <span>Mock tests</span></a><a class="side-link" href="{{ url_for('coding') }}">{ } <span>Coding practice</span></a><a class="side-link" href="{{ url_for('hr_practice') }}">✧ <span>HR preparation</span></a><a class="side-link" href="{{ url_for('progress') }}">↗ <span>My progress</span></a><a class="side-link" href="{{ url_for('recommendations') }}">✦ <span>Recommendations</span></a><a class="side-link" href="{{ url_for('profile') }}">◎ <span>My profile</span></a></aside>
+  <aside class="sidebar" aria-label="Student workspace">
+    <div class="sidebar-label">Workspace</div>
+    <a class="side-link active" aria-current="page" href="{{ url_for('dashboard') }}">◫ <span>Dashboard</span></a>
+    <a class="side-link" href="{{ url_for('questions') }}">◇ <span>Interview questions</span></a>
+    <a class="side-link" href="{{ url_for('mock_tests') }}">◷ <span>Mock tests</span></a>
+    <a class="side-link" href="{{ url_for('coding') }}">{ } <span>Coding practice</span></a>
+    <a class="side-link" href="{{ url_for('hr_practice') }}">✧ <span>HR preparation</span></a>
+    <a class="side-link" href="{{ url_for('progress') }}">↗ <span>My progress</span></a>
+    <a class="side-link" href="{{ url_for('recommendations') }}">✦ <span>Recommendations</span></a>
+    <a class="side-link" href="{{ url_for('profile') }}">◎ <span>My profile</span></a>
+  </aside>
+
   <section class="workspace">
-    <div class="page-heading"><div><span class="eyebrow">Your preparation space</span><h1>Hey, {{ current_user.full_name.split()[0] }} <span class="wave">✦</span></h1><p>Every focused session brings you closer to your next opportunity.</p></div><a class="button button-primary" href="{{ url_for('questions') }}">Start practicing <span>→</span></a></div>
-    <div class="stat-grid"><article class="stat-card stat-indigo"><span class="stat-label">Questions practiced</span><strong>{{ questions_attempted }}</strong><small>Keep your momentum going</small><i>◇</i></article><article class="stat-card stat-cyan"><span class="stat-label">Tests completed</span><strong>{{ completed_tests }}</strong><small>Timed practice sessions</small><i>◷</i></article><article class="stat-card stat-coral"><span class="stat-label">Average test score</span><strong>{{ average_score ~ '%' if average_score is not none else '—' }}</strong><small>{{ 'Based on saved test results' if average_score is not none else 'Your first result will appear here' }}</small><i>↗</i></article><article class="stat-card stat-green"><span class="stat-label">Coding samples passed</span><strong>{{ solved }}</strong><small>Sample-based checks only</small><i>{ }</i></article></div>
-    {% if overall_progress is not none %}<div class="overall-progress"><div><span class="eyebrow">Across measured areas</span><b>Overall preparation snapshot</b><small>Average of the subjects and modules with recorded activity</small></div><div class="overall-progress-score">{{ overall_progress }}%</div><div class="progress-track"><span style="width:{{ overall_progress }}%"></span></div></div>{% endif %}
-    <div class="dashboard-grid">
-      <section class="panel panel-large"><div class="panel-head"><div><span class="eyebrow">Your snapshot</span><h2>Subject performance</h2></div><a href="{{ url_for('progress') }}">Full progress →</a></div>{% if category_scores %}<div class="chart-wrap"><canvas id="subjectChart" aria-label="Subject performance chart"></canvas></div>{% else %}<div class="empty-state"><span class="empty-icon">✦</span><h3>Your progress starts here</h3><p>Practice a question or complete a mock test to see your measured results.</p><a class="button button-primary button-small" href="{{ url_for('questions') }}">Start your first practice</a></div>{% endif %}</section>
-      <section class="panel"><div class="panel-head"><div><span class="eyebrow">Quick start</span><h2>Pick your next step</h2></div></div><div class="quick-links"><a href="{{ url_for('questions') }}"><span class="quick-icon purple">◇</span><span><b>Practice questions</b><small>Build your fundamentals</small></span><span>→</span></a><a href="{{ url_for('mock_tests') }}"><span class="quick-icon blue">◷</span><span><b>Take a mock test</b><small>Try a timed challenge</small></span><span>→</span></a><a href="{{ url_for('coding') }}"><span class="quick-icon coral">{ }</span><span><b>Solve a coding problem</b><small>Learn by doing</small></span><span>→</span></a><a href="{{ url_for('recommendations') }}"><span class="quick-icon green">✦</span><span><b>See recommendations</b><small>Your evidence-based next steps</small></span><span>→</span></a></div></section>
+    <div class="page-heading dashboard-heading">
+      <div>
+        <span class="eyebrow">Your preparation space</span>
+        <h1>Welcome back, {{ current_user.full_name.split()[0] }} <span class="wave">✦</span></h1>
+        <p>Small, steady practice is how interview confidence grows.</p>
+      </div>
+      <a class="button button-primary" href="{{ url_for('questions') }}">Start practicing <span>→</span></a>
     </div>
-    <div class="dashboard-grid bottom-grid"><section class="panel"><div class="panel-head"><div><span class="eyebrow">Keep learning</span><h2>Mock tests to try</h2></div><a href="{{ url_for('mock_tests') }}">View all →</a></div>{% if tests %}<div class="test-mini-list">{% for test in tests %}<a href="{{ url_for('mock_tests') }}"><span class="test-mini-icon">◷</span><span><b>{{ test.title }}</b><small>{{ test.duration_minutes }} min · {{ test.category.name }}</small></span><span>→</span></a>{% endfor %}</div>{% else %}<p class="muted">Your admin can publish practice tests here.</p>{% endif %}</section><section class="panel"><div class="panel-head"><div><span class="eyebrow">Your journey</span><h2>Recent activity</h2></div></div>{% if recent %}<ul class="activity-list">{% for item in recent %}<li><span class="activity-dot"></span><span><b>{{ item.activity_type|replace('_',' ')|title }}</b><small>{{ item.created_at.strftime('%b %d, %Y · %H:%M') }}{% if item.score is not none %} · {{ item.score|round|int }}%{% endif %}</small></span></li>{% endfor %}</ul>{% else %}<div class="empty-compact"><span>✦</span><p>Your activity will show up after your first session.</p></div>{% endif %}</section></div>
+
+    <section class="streak-banner" aria-labelledby="streak-title">
+      <div class="streak-main">
+        <span class="streak-flame" aria-hidden="true">🔥</span>
+        <div>
+          <span class="streak-kicker">Your consistency</span>
+          <h2 id="streak-title"><strong>{{ streak.current }}</strong> day{% if streak.current != 1 %}s{% endif %} streak</h2>
+          <p>{% if streak.active_today %}You showed up today. Keep that momentum going!{% elif streak.current %}Practice today to keep your streak alive.{% else %}Complete a practice activity today to start your streak.{% endif %}</p>
+        </div>
+      </div>
+      <div class="streak-week" aria-label="Activity for the last seven days, in UTC">
+        <span class="streak-week-label">LAST 7 DAYS <span>· UTC</span></span>
+        <div class="streak-days">
+          {% for day in streak.week_days %}
+          <div class="streak-day {% if day.active %}streak-day-active{% endif %} {% if day.today %}streak-day-today{% endif %}" title="{{ day.date.strftime('%A, %b %d') }}{% if day.active %} · activity recorded{% else %} · no activity recorded{% endif %}">
+            <span>{{ day.date.strftime('%a')[:1] }}</span>
+            <b aria-label="{{ day.date.strftime('%A, %b %d') }}{% if day.active %}, active{% else %}, no activity{% endif %}">{{ "✓" if day.active else day.date.strftime('%d') }}</b>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="streak-best">
+        <span aria-hidden="true">✦</span>
+        <div><small>BEST STREAK</small><b>{{ streak.best }} day{% if streak.best != 1 %}s{% endif %}</b></div>
+        <i></i>
+        <div><small>ACTIVE DAYS</small><b>{{ streak.total_days }}</b></div>
+      </div>
+    </section>
+
+    <div class="stat-grid dashboard-stat-grid">
+      <article class="stat-card stat-indigo"><span class="stat-label">Questions practiced</span><strong>{{ questions_attempted }}</strong><small>Recorded practice sessions</small><i>◇</i></article>
+      <article class="stat-card stat-cyan"><span class="stat-label">Tests completed</span><strong>{{ completed_tests }}</strong><small>Timed practice sessions</small><i>◷</i></article>
+      <article class="stat-card stat-coral"><span class="stat-label">Average test score</span><strong>{{ average_score ~ '%' if average_score is not none else '—' }}</strong><small>{{ 'Based on saved test results' if average_score is not none else 'Your first result will appear here' }}</small><i>↗</i></article>
+      <article class="stat-card stat-green"><span class="stat-label">Coding samples passed</span><strong>{{ solved }}</strong><small>Sample-based checks only</small><i>{ }</i></article>
+    </div>
+
+    {% if overall_progress is not none %}
+    <div class="overall-progress">
+      <div><span class="eyebrow">Across measured areas</span><b>Overall preparation snapshot</b><small>Average of subjects and modules with recorded activity</small></div>
+      <div class="overall-progress-score">{{ overall_progress }}%</div>
+      <div class="progress-track"><span style="width:{{ overall_progress }}%"></span></div>
+    </div>
+    {% endif %}
+
+    <div class="dashboard-grid">
+      <section class="panel panel-large">
+        <div class="panel-head"><div><span class="eyebrow">Your snapshot</span><h2>Subject performance</h2></div><a href="{{ url_for('progress') }}">Full progress →</a></div>
+        {% if category_scores %}
+        <div class="chart-wrap"><canvas id="subjectChart" aria-label="Subject performance chart"></canvas></div>
+        {% else %}
+        <div class="empty-state"><span class="empty-icon">✦</span><h3>Your progress starts here</h3><p>Practice a question or complete a mock test to see your measured results.</p><a class="button button-primary button-small" href="{{ url_for('questions') }}">Start your first practice</a></div>
+        {% endif %}
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><span class="eyebrow">Quick start</span><h2>Pick your next step</h2></div></div>
+        <div class="quick-links">
+          <a href="{{ url_for('questions') }}"><span class="quick-icon purple">◇</span><span><b>Practice questions</b><small>Build your fundamentals</small></span><span>→</span></a>
+          <a href="{{ url_for('mock_tests') }}"><span class="quick-icon blue">◷</span><span><b>Take a mock test</b><small>Try a timed challenge</small></span><span>→</span></a>
+          <a href="{{ url_for('coding') }}"><span class="quick-icon coral">{ }</span><span><b>Solve a coding problem</b><small>Learn by doing</small></span><span>→</span></a>
+          <a href="{{ url_for('recommendations') }}"><span class="quick-icon green">✦</span><span><b>See recommendations</b><small>Your evidence-based next steps</small></span><span>→</span></a>
+        </div>
+      </section>
+    </div>
+
+    <div class="dashboard-grid bottom-grid">
+      <section class="panel">
+        <div class="panel-head"><div><span class="eyebrow">Keep learning</span><h2>Mock tests to try</h2></div><a href="{{ url_for('mock_tests') }}">View all →</a></div>
+        {% if tests %}<div class="test-mini-list">{% for test in tests %}<a href="{{ url_for('mock_tests') }}"><span class="test-mini-icon">◷</span><span><b>{{ test.title }}</b><small>{{ test.duration_minutes }} min · {{ test.category.name }}</small></span><span>→</span></a>{% endfor %}</div>
+        {% else %}<p class="muted">Your admin can publish practice tests here.</p>{% endif %}
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><span class="eyebrow">Your journey</span><h2>Recent activity</h2></div><a href="{{ url_for('progress') }}">View progress →</a></div>
+        {% if recent %}<ul class="activity-list">{% for item in recent %}<li><span class="activity-dot"></span><span><b>{{ item.activity_type|replace('_',' ')|title }}</b><small>{{ item.created_at.strftime('%b %d, %Y · %H:%M') }}{% if item.score is not none %} · {{ item.score|round|int }}%{% endif %}</small></span></li>{% endfor %}</ul>
+        {% else %}<div class="empty-compact"><span>✦</span><p>Your activity will show up after your first session.</p></div>{% endif %}
+      </section>
+    </div>
   </section>
 </div>
 {% if category_scores %}<script id="subject-data" type="application/json">{{ category_scores|tojson }}</script>{% endif %}

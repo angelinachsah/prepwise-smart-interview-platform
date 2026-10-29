@@ -1,5 +1,5 @@
 """Flask application factory and HTTP routes."""
-from datetime import timedelta, timezone
+from datetime import date, timedelta, timezone
 from functools import wraps
 import json
 import re
@@ -54,6 +54,57 @@ def _utc(value):
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def summarize_activity_streak(activity_dates, today=None):
+    """Summarize distinct UTC activity dates and the trailing seven-day window."""
+    today = today or utcnow().date()
+    dates = set(activity_dates)
+    active_today = today in dates
+
+    cursor = today if active_today else today - timedelta(days=1)
+    current_streak = 0
+    while cursor in dates:
+        current_streak += 1
+        cursor -= timedelta(days=1)
+
+    best_streak = 0
+    running_streak = 0
+    previous_day = None
+    for activity_day in sorted(dates):
+        if previous_day and activity_day == previous_day + timedelta(days=1):
+            running_streak += 1
+        else:
+            running_streak = 1
+        best_streak = max(best_streak, running_streak)
+        previous_day = activity_day
+
+    week_start = today - timedelta(days=6)
+    week_days = [
+        {
+            "date": week_start + timedelta(days=offset),
+            "active": week_start + timedelta(days=offset) in dates,
+            "today": week_start + timedelta(days=offset) == today,
+        }
+        for offset in range(7)
+    ]
+    return {
+        "current": current_streak,
+        "best": best_streak,
+        "active_today": active_today,
+        "total_days": len(dates),
+        "week_days": week_days,
+    }
+
+
+def _activity_streak(user_id):
+    stored_dates = db.session.query(
+        db.func.date(ActivityLog.created_at)
+    ).filter_by(user_id=user_id).distinct().all()
+    activity_dates = {
+        date.fromisoformat(row[0]) for row in stored_dates if row[0]
+    }
+    return summarize_activity_streak(activity_dates)
 
 
 def _get_attempt_or_404(attempt_id):
@@ -225,6 +276,7 @@ def create_app(config_override=None):
         average_score = round(sum(test_scores) / len(test_scores)) if test_scores else None
         recent = ActivityLog.query.filter_by(user_id=user_id).order_by(ActivityLog.created_at.desc()).limit(6).all()
         category_scores = _score_summary(user_id)
+        streak = _activity_streak(user_id)
         overall_progress = round(
             sum(item["score"] for item in category_scores) / len(category_scores)
         ) if category_scores else None
@@ -234,6 +286,7 @@ def create_app(config_override=None):
             average_score=average_score, recent=recent,
             category_scores=category_scores,
             overall_progress=overall_progress,
+            streak=streak,
             tests=MockTest.query.filter_by(is_published=True).limit(3).all(),
         )
 
@@ -421,8 +474,10 @@ def create_app(config_override=None):
                 test_cases_passed=1 if passed else 0, test_cases_total=1,
             )
             db.session.add(submission)
-            if passed:
-                log_activity("coding_sample_passed", problem.id, 100)
+            log_activity(
+                "coding_sample_passed" if passed else "coding_sample_attempt",
+                problem.id, 100 if passed else 0,
+            )
             db.session.commit()
             refresh_recommendations(current_user.id)
             flash(

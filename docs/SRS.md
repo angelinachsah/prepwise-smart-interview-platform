@@ -65,7 +65,7 @@ The operator installs packages from `requirements.txt`, sets a private secret, a
 | FR-010 | The system shall omit answer keys from the taking-test response and calculate scores on the server. | Response inspection and scoring test. |
 | FR-011 | The system shall validate test answer IDs/options, prevent repeated submission, and restrict result access to the owner or admin. | Invalid-ID, result access, and submission-state tests. |
 | FR-012 | The system shall automatically submit an in-progress attempt after its configured duration. | Server deadline behavior; browser countdown mirrors remaining time. |
-| FR-013 | The system shall provide coding problem statements, sample cases, hints, and safe sample-output comparison without executing code. | Coding route and sample-check test. |
+| FR-013 | The system shall provide coding problem statements, constraints, multiple examples, hints, detailed explanations, and safe comparison against a selected displayed sample without executing code. | Coding route, seeded test cases, explanation page, and sample-check tests. |
 | FR-014 | The system shall save a student's HR draft and practice flag. | HR persistence test. |
 | FR-015 | The system shall show database-backed question, test, coding, and HR activity. | Dashboard/progress queries and empty states. |
 | FR-016 | The system shall generate recommendations from measured category scores and avoid inventing scores for new users. | Recommendation rules and onboarding state. |
@@ -153,7 +153,7 @@ The local development server uses HTTP on `127.0.0.1:5000`. HTTPS is expected to
 | FR-001–006 | `app.py` auth/profile routes, `models.py` User | `tests/test_app.py`, TC-001–008 |
 | FR-007–008 | `app.py` question routes | `tests/test_app.py`, TC-009–013 |
 | FR-009–012 | test routes and attempt models | `tests/test_app.py`, TC-014–022 |
-| FR-013 | coding route and CodingSubmission | `tests/test_app.py`, TC-023–025 |
+| FR-013 | coding route, CodingProblem examples, and CodingSubmission | `tests/test_app.py`, TC-023–027 and TC-046–049 |
 | FR-014 | HR route and HRPractice | `tests/test_app.py`, TC-026 |
 | FR-015–016 | dashboard/progress/recommendation logic | `tests/test_app.py`, TC-027–030 |
 | FR-017–019 | admin routes/dashboard | `tests/test_app.py`, TC-031–037 |

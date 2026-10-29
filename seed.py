@@ -1,5 +1,6 @@
 """Initialize and seed local demonstration content."""
 import argparse
+import json
 import os
 
 from app import create_app
@@ -106,21 +107,126 @@ QUESTION_BANK = {
 }
 
 CODING_DATA = [
-    ("Find the largest element", "Return the greatest integer in a non-empty array.", "[3, 9, 2]", "9", "Input is a non-empty list of integers.", "Compare values while scanning once."),
-    ("Reverse a string", "Return the characters of a string in reverse order.", "interview", "weivretni", "Input is a string.", "Build from the final character toward the first."),
-    ("Check prime number", "Determine whether an integer greater than one is prime.", "17", "True", "Input is an integer.", "Test divisors only up to the square root."),
-    ("Palindrome string", "Check whether a string reads the same forward and backward.", "level", "True", "Compare exact characters.", "Compare the string with its reverse."),
-    ("Factorial", "Compute n! for a non-negative integer n.", "5", "120", "0 <= n <= 20.", "Start with one and multiply through n."),
-    ("Fibonacci sequence", "Return the first n Fibonacci numbers beginning with 0, 1.", "7", "[0, 1, 1, 2, 3, 5, 8]", "0 <= n <= 40.", "Keep the previous two values."),
-    ("Sum array elements", "Return the sum of all integers in an array.", "[4, -1, 2]", "5", "Array may be empty.", "Accumulate each value."),
-    ("Count vowels", "Count English vowels in a string, ignoring case.", "Smart", "1", "Input contains ordinary English characters.", "Normalize case and test membership in a vowel set."),
-    ("Sort an array", "Return integers in ascending order.", "[4, 1, 3]", "[1, 3, 4]", "Input may include duplicates.", "Use a comparison-based sort or explain its complexity."),
-    ("Find duplicate values", "Return distinct values that appear more than once.", "[1, 2, 1, 3, 2]", "[1, 2]", "Return duplicates in first repeated-value order.", "Track values seen and values already reported."),
-    ("Armstrong number", "Check whether a non-negative integer equals the sum of its digits raised to the digit count.", "153", "True", "Input is non-negative.", "For 153: 1³ + 5³ + 3³ equals 153."),
-    ("Second-largest distinct value", "Return the second-largest distinct integer, or None if absent.", "[8, 3, 8, 5]", "5", "Input can contain duplicates.", "Track the largest two distinct values."),
-    ("Character frequencies", "Count each character in a string.", "aba", "{'a': 2, 'b': 1}", "Treat characters as case-sensitive.", "Use a dictionary keyed by character."),
-    ("Remove duplicates", "Return the values of an array in first-seen order without duplicates.", "[3, 1, 3, 2]", "[3, 1, 2]", "Input contains hashable integers.", "Use a seen set and preserve traversal order."),
-    ("Missing number", "Given unique values from 0 through n with one missing, return the missing value.", "[3, 0, 1]", "2", "Input length is n and values are in [0,n].", "Compare the expected arithmetic sum with the actual sum."),
+    {
+        "title": "Find the largest element",
+        "description": "Given a non-empty integer array, return its greatest value. Do not sort the array just to find the answer.",
+        "constraints": "1 <= len(nums) <= 100,000; -1,000,000 <= nums[i] <= 1,000,000.",
+        "hint": "Keep the largest value seen so far and compare each next element with it.",
+        "explanation": "Initialize the running maximum with the first array value. Scan the rest once, replacing the maximum whenever a larger number appears. This works for all-negative arrays too because it does not assume zero is in the input. Time: O(n); extra space: O(1).",
+        "cases": [("[3, 9, 2]", "9"), ("[-8, -3, -11]", "-3"), ("[5]", "5")],
+    },
+    {
+        "title": "Reverse a string",
+        "description": "Given a string, return a new string with its characters in reverse order. An empty string should remain empty.",
+        "constraints": "0 <= len(s) <= 100,000; input contains ordinary Unicode text.",
+        "hint": "Think about reading characters from the final index back to the first.",
+        "explanation": "The character at index i moves to index len(s)-1-i. A reverse traversal or the language's slicing operation creates the result without changing the original string. Time: O(n); output space: O(n).",
+        "cases": [('"interview"', "weivretni"), ('"a"', "a"), ('""', "")],
+    },
+    {
+        "title": "Check prime number",
+        "description": "Given an integer n, return True if n is prime and False otherwise. A prime is greater than 1 and has no positive divisors except 1 and itself.",
+        "constraints": "0 <= n <= 10^9.",
+        "hint": "After handling values below 2, it is enough to test candidate divisors up to the square root of n.",
+        "explanation": "Values below 2 are not prime. For larger values, if n has a factor greater than sqrt(n), its paired factor must be smaller than sqrt(n), so testing beyond the square root is unnecessary. Stop as soon as a divisor is found. Time: O(sqrt(n)); extra space: O(1).",
+        "cases": [("17", "True"), ("1", "False"), ("49", "False"), ("2", "True")],
+    },
+    {
+        "title": "Palindrome string",
+        "description": "Given a string s, return True when it reads identically from left to right and right to left; otherwise return False. Compare characters exactly.",
+        "constraints": "0 <= len(s) <= 100,000; comparison is case-sensitive and includes spaces.",
+        "hint": "Compare matching characters from the two ends and move inward.",
+        "explanation": "A string is a palindrome if every character at index i matches the character at the mirrored index len(s)-1-i. You only need to inspect half the string. Under the stated exact comparison, capitalization and spaces are significant. Time: O(n); extra space: O(1) with two pointers.",
+        "cases": [('"level"', "True"), ('"python"', "False"), ('""', "True"), ('"Aa"', "False")],
+    },
+    {
+        "title": "Factorial",
+        "description": "Return n factorial (n!), the product of every positive integer from 1 through n. By definition, 0! equals 1.",
+        "constraints": "0 <= n <= 20; return an integer.",
+        "hint": "Start with a product of 1, then multiply by each integer from 2 through n.",
+        "explanation": "Repeatedly multiply an accumulator by 2, 3, ..., n. For n=5 the intermediate products are 1, 2, 6, 24, 120. The loop naturally returns 1 for n=0. Time: O(n); extra space: O(1).",
+        "cases": [("5", "120"), ("0", "1"), ("1", "1"), ("3", "6")],
+    },
+    {
+        "title": "Fibonacci sequence",
+        "description": "Return a list containing the first n Fibonacci numbers, starting with 0 and 1. Each later number is the sum of the two before it.",
+        "constraints": "0 <= n <= 40.",
+        "hint": "Keep the previous two values, append the current one, then advance the pair.",
+        "explanation": "Begin with an empty result and a pair (0, 1). Repeat n times: append the first value, then replace the pair with (second, first + second). This also handles n=0 without a special output. Time: O(n); output space: O(n).",
+        "cases": [("7", "[0, 1, 1, 2, 3, 5, 8]"), ("0", "[]"), ("1", "[0]"), ("2", "[0, 1]")],
+    },
+    {
+        "title": "Sum array elements",
+        "description": "Given an integer array, return the sum of all its values. The empty array has sum 0.",
+        "constraints": "0 <= len(nums) <= 100,000; -10,000 <= nums[i] <= 10,000.",
+        "hint": "Start a running total at zero and add each element once.",
+        "explanation": "Initialize total to 0 and add every array value. Negative numbers reduce the total; duplicates are added each time they appear. With no values, total remains 0. Time: O(n); extra space: O(1).",
+        "cases": [("[4, -1, 2]", "5"), ("[]", "0"), ("[-2, -3]", "-5"), ("[7]", "7")],
+    },
+    {
+        "title": "Count vowels",
+        "description": "Count the English vowels a, e, i, o, and u in a string, treating uppercase and lowercase as the same. The letter y is not a vowel for this problem.",
+        "constraints": "0 <= len(s) <= 100,000; s contains English letters and spaces.",
+        "hint": "Normalize each character's case and check whether it belongs to the set {a, e, i, o, u}.",
+        "explanation": "Walk through the characters and increment a counter when the lowercase character is one of a, e, i, o, or u. Each character is checked once. Time: O(n); extra space: O(1).",
+        "cases": [('"Smart"', "1"), ('"Interview"', "4"), ('"rhythm"', "0"), ('""', "0")],
+    },
+    {
+        "title": "Sort an array",
+        "description": "Given an integer array, return its values in non-decreasing order. Keep duplicates; the input array may be empty.",
+        "constraints": "0 <= len(nums) <= 100,000; -10^9 <= nums[i] <= 10^9.",
+        "hint": "Use a comparison-based sort, or implement merge sort if practicing the algorithm.",
+        "explanation": "A standard library sort returns the values in ascending order and keeps equal values. For algorithm practice, merge sort divides the array, sorts each half, and merges the sorted halves. Time: O(n log n) for an efficient comparison sort; output space depends on the chosen algorithm.",
+        "cases": [("[4, 1, 3]", "[1, 3, 4]"), ("[5, 1, 5, -2]", "[-2, 1, 5, 5]"), ("[]", "[]")],
+    },
+    {
+        "title": "Find duplicate values",
+        "description": "Return each value that occurs more than once, exactly once, ordered by the position where its second occurrence appears.",
+        "constraints": "0 <= len(nums) <= 100,000; nums contains integers.",
+        "hint": "Track values already seen and values already added to the output.",
+        "explanation": "Scan left to right. When a value has appeared before and is not yet in the duplicate list, append it. This defines the output order by the first time a duplicate is detected. A set makes membership checks average O(1). Time: O(n) average; extra space: O(n).",
+        "cases": [("[1, 2, 1, 3, 2]", "[1, 2]"), ("[4, 4, 4]", "[4]"), ("[1, 2, 3]", "[]"), ("[]", "[]")],
+    },
+    {
+        "title": "Armstrong number",
+        "description": "Return True if a non-negative integer equals the sum of each of its digits raised to the number of digits. Treat 0 as an Armstrong number.",
+        "constraints": "0 <= n <= 10^9.",
+        "hint": "Convert the number to digits, count the digits, and sum each digit raised to that count.",
+        "explanation": "For 153 there are three digits, and 1^3 + 5^3 + 3^3 = 153, so it is an Armstrong number. For 10, 1^2 + 0^2 = 1, which is not 10. A single digit n satisfies n^1=n. Time: O(d), where d is the number of digits.",
+        "cases": [("153", "True"), ("10", "False"), ("0", "True"), ("9474", "True")],
+    },
+    {
+        "title": "Second-largest distinct value",
+        "description": "Return the second-largest distinct value in an integer array. Return None if the array contains fewer than two distinct values.",
+        "constraints": "0 <= len(nums) <= 100,000; nums contains integers.",
+        "hint": "Track the largest and second-largest distinct values; do not treat a duplicate maximum as the runner-up.",
+        "explanation": "Scan once while maintaining the top two distinct values. When a new value exceeds the largest, move the old largest into second place. Otherwise update second only when the value is below largest and above the current second. Time: O(n); extra space: O(1).",
+        "cases": [("[8, 3, 8, 5]", "5"), ("[7, 7]", "None"), ("[-5, -2, -9]", "-5"), ("[]", "None")],
+    },
+    {
+        "title": "Character frequencies",
+        "description": "Return a mapping from each character in a string to its number of occurrences. Treat uppercase and lowercase as different characters.",
+        "constraints": "0 <= len(s) <= 100,000; input may contain letters, digits, or spaces.",
+        "hint": "Use a dictionary and increment the count for each character as you scan.",
+        "explanation": "For each character, increase its dictionary count by one, starting from zero when first seen. The result contains one key per distinct character. For example, in 'aba', a appears twice and b appears once. Time: O(n) average; extra space: O(k), where k is the number of distinct characters.",
+        "cases": [('"aba"', "{'a': 2, 'b': 1}"), ('""', "{}"), ('"Aa "', "{'A': 1, 'a': 1, ' ': 1}")],
+    },
+    {
+        "title": "Remove duplicates",
+        "description": "Return the array with duplicates removed while preserving the order of each value's first appearance.",
+        "constraints": "0 <= len(nums) <= 100,000; nums contains integers.",
+        "hint": "Use a set to test whether a value has appeared, but append to a list to preserve order.",
+        "explanation": "Scan from left to right. If a number is not in the seen set, append it to the result and add it to seen. Later copies are skipped. The set is only used for lookup; the result list preserves original first-seen order. Time: O(n) average; extra space: O(n).",
+        "cases": [("[3, 1, 3, 2]", "[3, 1, 2]"), ("[5, 5, 5]", "[5]"), ("[]", "[]")],
+    },
+    {
+        "title": "Missing number",
+        "description": "An array contains n distinct values chosen from the range 0 through n, with exactly one value missing. Return the missing value.",
+        "constraints": "0 <= len(nums) <= 100,000; every value is unique and 0 <= nums[i] <= len(nums).",
+        "hint": "The sum of 0 through n is n(n+1)/2. Subtract the actual array sum.",
+        "explanation": "Compute the expected sum for all n+1 values, then subtract the sum of the n values in the array. The difference is the missing number. This method uses constant extra space and does not need to sort. Time: O(n); extra space: O(1).",
+        "cases": [("[3, 0, 1]", "2"), ("[0, 1]", "2"), ("[1]", "0"), ("[]", "0")],
+    },
 ]
 
 HR_DATA = [
@@ -168,16 +274,24 @@ def seed_data(admin_email=None, admin_password=None, demo=False):
                     correct_answer=correct, explanation=explanation,
                     tags=name.lower(),
                 ))
-    for title, description, sample_input, sample_output, constraints, hints in CODING_DATA:
-        if not CodingProblem.query.filter_by(title=title).first():
-            db.session.add(CodingProblem(
-                title=title, description=description, difficulty="Beginner",
-                input_format="One value in the displayed sample format.",
-                output_format="Return the expected result in the displayed format.",
-                sample_input=sample_input, sample_output=sample_output,
-                constraints=constraints, hints=hints,
-                solution_explanation=hints,
-            ))
+    for problem_data in CODING_DATA:
+        cases = [
+            {"input": sample_input, "output": sample_output}
+            for sample_input, sample_output in problem_data["cases"]
+        ]
+        problem = CodingProblem.query.filter_by(title=problem_data["title"]).first()
+        if not problem:
+            problem = CodingProblem(title=problem_data["title"], difficulty="Beginner")
+            db.session.add(problem)
+        problem.description = problem_data["description"]
+        problem.input_format = "Input is shown as a Python value in each example. Implement a function that accepts this value."
+        problem.output_format = "Return the result in the same representation as the expected output."
+        problem.sample_input = cases[0]["input"]
+        problem.sample_output = cases[0]["output"]
+        problem.constraints = problem_data["constraints"]
+        problem.hints = problem_data["hint"]
+        problem.solution_explanation = problem_data["explanation"]
+        problem.test_cases_json = json.dumps(cases)
     for question, example, tips, category in HR_DATA:
         if not HRQuestion.query.filter_by(question_text=question).first():
             db.session.add(HRQuestion(

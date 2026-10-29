@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import timedelta
 
@@ -198,6 +199,47 @@ def test_coding_sample_check_never_claims_full_execution(client, app):
         assert submission.result_status == "sample_passed"
 
 
+def test_coding_problem_shows_multiple_examples_and_clear_explanation(client, app):
+    login(client)
+    with app.app_context():
+        problem = CodingProblem.query.filter_by(title="Find the largest element").first()
+        problem_id = problem.id
+    response = client.get(f"/coding/{problem_id}")
+    assert response.status_code == 200
+    assert b"Example 1" in response.data
+    assert b"Example 2" in response.data
+    assert b"Time: O(n)" in response.data
+    assert b"LeetCode-style practice" in response.data
+
+
+def test_coding_sample_check_can_select_another_displayed_example(client, app):
+    login(client)
+    with app.app_context():
+        problem = CodingProblem.query.filter_by(title="Find the largest element").first()
+        problem_id = problem.id
+    response = client.post(f"/coding/{problem_id}", data={
+        "code": "def largest(nums): ...",
+        "case_index": "1",
+        "observed_output": "-3",
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Sample output matches" in response.data
+
+
+def test_coding_sample_check_supports_an_empty_expected_output(client, app):
+    login(client)
+    with app.app_context():
+        problem = CodingProblem.query.filter_by(title="Reverse a string").first()
+        problem_id = problem.id
+    response = client.post(f"/coding/{problem_id}", data={
+        "code": "def reverse(s): return s[::-1]",
+        "case_index": "2",
+        "observed_output": "",
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Sample output matches" in response.data
+
+
 def test_hr_answer_is_saved_and_marked_practiced(client, app):
     login(client)
     with app.app_context():
@@ -324,5 +366,10 @@ def test_seed_content_meets_requested_minimums(app):
         assert Question.query.count() >= 60
         assert MockTest.query.count() >= 5
         assert CodingProblem.query.count() >= 15
+        assert all(
+            len(json.loads(problem.test_cases_json)) >= 3
+            and len(problem.solution_explanation) > 100
+            for problem in CodingProblem.query.all()
+        )
         from models import HRQuestion
         assert HRQuestion.query.count() >= 20

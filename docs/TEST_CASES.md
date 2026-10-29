@@ -53,6 +53,10 @@ Status values below are deliberately `Pending` until a corresponding manual test
 | TC-043 | FR-023 | Add and rename an unused category | Admin session | Create and rename a category | Unique category name | Category is saved with the updated name | `test_admin_category_and_question_management` passed | Pass | Automated |
 | TC-044 | FR-019 | Disable an active student account | Admin and student sessions | Admin disables the student; student requests dashboard | Existing student session | Disabled account is no longer authenticated | `test_admin_disabling_account_invalidates_existing_session` passed | Pass | Automated |
 | TC-045 | FR-017 | Edit and delete unused question content | Admin session; question has no history | Create, edit, and delete an unlinked question | Temporary descriptive question | Updated question persists; unused content can be deleted | `test_admin_category_and_question_management` passed | Pass | Automated |
+| TC-046 | FR-013 | Display several coding examples and a clear solution explanation | Student session; seeded coding problem | Open a coding problem | Largest-element problem | Multiple examples, edge cases, approach, and complexity appear | `test_coding_problem_shows_multiple_examples_and_clear_explanation` passed | Pass | Automated |
+| TC-047 | FR-013 | Compare against a selected example | Student session; seeded coding problem | Select a non-first example and enter its expected output | Example 2 output `-3` | Selected sample comparison passes; source is not executed | `test_coding_sample_check_can_select_another_displayed_example` passed | Pass | Automated |
+| TC-048 | FR-013 | Ensure seed data includes case coverage and detailed explanations | Isolated seeded database | Inspect all starter coding problems | At least three cases per problem | Every coding problem has multiple examples and an explanation | `test_seed_content_meets_requested_minimums` passed | Pass | Automated |
+| TC-049 | FR-013 | Compare an empty expected output | Student session; reverse-string problem | Select the empty-string example and leave observed output blank | Empty input and empty output | Empty result can be checked without treating blank input as missing | `test_coding_sample_check_supports_an_empty_expected_output` passed | Pass | Automated |
 
 ## Automated test execution
 
@@ -60,4 +64,4 @@ Run `python -m pytest -q` from the project directory. The automated test file is
 
 ### Observed run
 
-On 2026-10-29, the final full automated suite completed with **17 passed** in 37.28 seconds. Rows explicitly marked Automated above map to assertions in that run. Other manual-only cases remain `Not Executed` / `Pending`; no manual behavior is claimed.
+On 2026-10-29, the final full automated suite completed with **20 passed** in 62.61 seconds. Rows explicitly marked Automated above map to assertions in that run. Other manual-only cases remain `Not Executed` / `Pending`; no manual behavior is claimed.

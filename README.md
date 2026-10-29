@@ -12,7 +12,7 @@ Students often prepare from scattered materials and have difficulty seeing which
 - Student dashboard with database-backed counters, recent activity, and a subject performance chart.
 - Searchable, filterable, paginated question bank with bookmarks, multiple-choice practice, and explanations.
 - Timed mock tests with server timestamps, answer validation, server-side scoring, one-time submission, and private result pages.
-- Fifteen beginner coding prompts. The server stores submissions and checks a manually entered sample output; it never executes submitted code.
+- Fifteen beginner, LeetCode-style coding prompts with constraints, multiple sample test cases (including edge cases), step-by-step algorithm explanations, and complexity notes. The server stores submissions and compares manually entered output against a selected example; it never executes submitted code.
 - Twenty HR prompts with saved drafts, example structures, and a practice checklist.
 - Performance summaries and transparent rule-based recommendations that are refreshed after practice/test activity.
 - Admin tools for managing categories, creating/editing questions, creating/configuring mock tests, adding coding and HR content, enabling/disabling student accounts, and reviewing student accounts and submitted test results. Content with saved attempt history is protected from destructive edits.

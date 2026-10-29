@@ -1,11 +1,49 @@
 {% extends "base.html" %}
 {% block title %}{{ problem.title }}{% endblock %}
 {% block content %}
-<section class="page-wrap narrow-wrap"><a class="back-link" href="{{ url_for('coding') }}">← Back to coding practice</a><article class="panel detail-panel">
-  <span class="pill pill-neutral">{{ problem.difficulty }}</span><h1>{{ problem.title }}</h1><p class="lead-small">{{ problem.description }}</p>
-  <div class="problem-specs"><div><h3>Input format</h3><p>{{ problem.input_format }}</p></div><div><h3>Output format</h3><p>{{ problem.output_format }}</p></div><div><h3>Constraints</h3><p>{{ problem.constraints }}</p></div></div>
-  <div class="sample-block"><h3>Sample input</h3><pre>{{ problem.sample_input }}</pre><h3>Expected sample output</h3><pre>{{ problem.sample_output }}</pre></div>
-  <details class="hint-box"><summary>Need a hint?</summary><p>{{ problem.hints }}</p><p><b>Approach:</b> {{ problem.solution_explanation }}</p></details>
-  <form method="post" class="form-stack code-submit"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Your Python solution<textarea name="code" rows="12" maxlength="20000" required placeholder="Write your solution here. It will be stored, not executed."></textarea></label><label>Observed output for the sample<input name="observed_output" required maxlength="2000" placeholder="Enter the output you got when testing locally"></label><p class="notice notice-info">This sample check only compares your entered output with the example. Your code is never run by the server, and a match does not prove it passes hidden tests.</p><button class="button button-primary" type="submit">Check sample output <span>→</span></button></form>
-</article></section>
+<section class="page-wrap narrow-wrap">
+  <a class="back-link" href="{{ url_for('coding') }}">← Back to coding practice</a>
+  <article class="panel detail-panel coding-detail">
+    <div class="coding-title-row"><span class="pill pill-neutral">{{ problem.difficulty }}</span><span class="pill pill-indigo">LeetCode-style practice</span></div>
+    <h1>{{ problem.title }}</h1>
+    <p class="lead-small">{{ problem.description }}</p>
+
+    <div class="problem-specs">
+      <div><h3>Input</h3><p>{{ problem.input_format }}</p></div>
+      <div><h3>Output</h3><p>{{ problem.output_format }}</p></div>
+      <div><h3>Constraints</h3><p>{{ problem.constraints }}</p></div>
+    </div>
+
+    <section class="examples-section">
+      <div class="coding-section-heading"><div><span class="eyebrow">Understand the behavior</span><h2>Examples & test cases</h2></div><span class="pill pill-neutral">{{ sample_cases|length }} cases</span></div>
+      {% for case in sample_cases %}
+      <article class="example-card">
+        <h3>Example {{ loop.index }}{% if loop.first %} · Sample{% endif %}</h3>
+        <div class="example-io"><div><b>Input</b><pre>{{ case.input }}</pre></div><div><b>Expected output</b><pre>{{ case.output if case.output else '(empty output)' }}</pre></div></div>
+      </article>
+      {% endfor %}
+      <p class="example-note">These examples illustrate edge cases too; they are not a complete hidden test suite.</p>
+    </section>
+
+    <section class="explanation-panel">
+      <span class="eyebrow">Step-by-step idea</span>
+      <h2>Explanation</h2>
+      <p>{{ problem.solution_explanation }}</p>
+    </section>
+
+    <details class="hint-box"><summary>Want a hint first?</summary><p>{{ problem.hints }}</p></details>
+
+    <form method="post" class="form-stack code-submit">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <span class="eyebrow">Try it yourself</span>
+      <label>Choose an example to compare
+        <select name="case_index">{% for case in sample_cases %}<option value="{{ loop.index0 }}">Example {{ loop.index }}{% if loop.first %} (sample){% endif %}: {{ case.input|truncate(55) }}</option>{% endfor %}</select>
+      </label>
+      <label>Your Python solution<textarea name="code" rows="12" maxlength="20000" required placeholder="Write your solution here. The server stores it but does not execute it."></textarea></label>
+      <label>Observed output for the selected example<input name="observed_output" maxlength="2000" placeholder="Enter the expected output exactly as shown; leave blank for empty output"></label>
+      <p class="notice notice-info"><b>Safe practice mode:</b> the server compares your entered output with the selected example only. It never runs your code. A match is not proof that your solution handles every case.</p>
+      <button class="button button-primary" type="submit">Compare sample output <span>→</span></button>
+    </form>
+  </article>
+</section>
 {% endblock %}

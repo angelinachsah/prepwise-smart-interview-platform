@@ -1,6 +1,7 @@
 """Flask application factory and HTTP routes."""
 from datetime import timedelta, timezone
 from functools import wraps
+import json
 import re
 
 from flask import (
@@ -395,11 +396,25 @@ def create_app(config_override=None):
         problem = db.get_or_404(CodingProblem, problem_id)
         if request.method == "POST":
             code = request.form.get("code", "")
-            output = request.form.get("observed_output", "").strip()
+            output = request.form.get("observed_output", "")
+            try:
+                sample_cases = json.loads(problem.test_cases_json)
+            except json.JSONDecodeError as error:
+                raise ValueError(f"Invalid coding problem test-case data for problem {problem.id}.") from error
+            if not isinstance(sample_cases, list) or not sample_cases or any(
+                not isinstance(case, dict) or not isinstance(case.get("output"), str)
+                for case in sample_cases
+            ):
+                raise ValueError(f"Coding problem {problem.id} has no sample cases configured.")
+            case_index = request.form.get("case_index", default="0")
+            if not case_index.isdigit() or int(case_index) >= len(sample_cases):
+                abort(400)
             if not code.strip() or len(code) > 20000:
                 flash("Enter code (up to 20,000 characters) before checking the sample.", "error")
                 return redirect(url_for("coding_detail", problem_id=problem.id))
-            passed = output == problem.sample_output.strip()
+            selected_case = sample_cases[int(case_index)]
+            expected_output = str(selected_case.get("output", "")).strip()
+            passed = output == expected_output
             submission = CodingSubmission(
                 user_id=current_user.id, problem_id=problem.id,
                 submitted_code=code, result_status="sample_passed" if passed else "sample_failed",
@@ -416,7 +431,18 @@ def create_app(config_override=None):
                 "success" if passed else "error",
             )
             return redirect(url_for("coding_detail", problem_id=problem.id))
-        return render_template("coding_detail.html", problem=problem)
+        try:
+            sample_cases = json.loads(problem.test_cases_json)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"Invalid coding problem test-case data for problem {problem.id}.") from error
+        if not isinstance(sample_cases, list) or any(
+            not isinstance(case, dict)
+            or not isinstance(case.get("input"), str)
+            or not isinstance(case.get("output"), str)
+            for case in sample_cases
+        ):
+            raise ValueError(f"Coding problem {problem.id} test cases have an invalid format.")
+        return render_template("coding_detail.html", problem=problem, sample_cases=sample_cases)
 
     @app.get("/hr")
     @login_required
@@ -792,6 +818,10 @@ def create_app(config_override=None):
                 constraints=request.form.get("constraints", "").strip()[:1000],
                 hints=request.form.get("hints", "").strip()[:1000],
                 solution_explanation=request.form.get("solution_explanation", "").strip()[:2000],
+                test_cases_json=json.dumps([{
+                    "input": sample_input,
+                    "output": sample_output,
+                }]),
             ))
             db.session.commit()
             flash("Coding problem created.", "success")
